@@ -1,13 +1,18 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"os"
 
 	"github.com/sianwa11/gator/internal/config"
+	"github.com/sianwa11/gator/internal/database"
+
+	_ "github.com/lib/pq"
 )
 
 type state struct {
+	db *database.Queries
 	cfg *config.Config
 }
 
@@ -17,15 +22,30 @@ func main(){
 	if err != nil {
 		log.Fatalf("error reading config: %v", err)
 	}
+	
+	db, err := sql.Open("postgres", cfg.DBURL)
+	if err != nil {
+		log.Fatalf("error opening db connection: %v", err)
+	}
+
+	dbQueries := database.New(db)
 
 	programState := &state{
 		cfg: &cfg,
+		db: dbQueries,
 	}
 
 	cmds := &commands{
 	registeredCommands: make(map[string]func(*state, command) error),
 	}
+
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handleRegister)
+	cmds.register("reset", handleDelete)
+	cmds.register("users", handleUsers)
+	cmds.register("agg", handleFeed)
+	cmds.register("addfeed", handleAddFeed)
+	cmds.register("feeds", handleGetFeeds)
 
 	
 	if len(os.Args) < 2 {
