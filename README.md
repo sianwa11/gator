@@ -1,82 +1,57 @@
-# Gator - RSS Feed Reader CLI
+# Gator
 
-Gator is a command-line RSS feed reader that helps you manage and read content from your favorite websites.
-
-## Prerequisites
-
-Before you can use Gator, you'll need:
-
-- **Go** (version 1.20 or later)
-- **PostgreSQL** database
+A multi-player command line tool for aggregating RSS feeds and viewing the posts.
 
 ## Installation
 
-Install Gator using Go:
+Make sure you have the latest [Go toolchain](https://golang.org/dl/) installed as well as a local Postgres database. You can then install `gator` with:
 
 ```bash
-go install github.com/sianwa11/gator@latest
+go install ...
 ```
 
-## Configuration
+## Config
 
-1. Create a configuration directory and file:
-
-```bash
-mkdir -p ~/.config/gator
-touch ~/.config/gator/config.json
-```
-
-2. Edit the config file with your database connection details:
+Create a `.gatorconfig.json` file in your home directory with the following structure:
 
 ```json
 {
-  "database_url": "postgres://username:password@localhost:5432/gator?sslmode=disable",
-  "current_user_name": ""
+  "db_url": "postgres://username:@localhost:5432/database?sslmode=disable"
 }
 ```
 
-Replace `username` and `password` with your PostgreSQL credentials.
+Replace the values with your database connection string.
 
 ## Usage
 
-Once installed, run Gator by typing:
+Create a new user:
 
 ```bash
-gator
+gator register <name>
 ```
 
-### Available Commands
+Add a feed:
 
-#### User Management
-- `register <username>` - Create a new user
-- `login <username>` - Log in as a user
-
-#### Feed Management
-- `add-feed <name> <url>` - Add a new RSS feed
-- `list-feeds` - Show all your feeds
-- `fetch-feeds` - Update all your feeds
-
-#### Reading Content
-- `browse [limit]` - Browse recent posts (default limit is 10)
-
-#### Help
-- `help` - Display available commands
-
-## Example Workflow
-
-```
-$ gator
-> register john_doe
-User created successfully!
-
-> login john_doe
-Logged in as john_doe
-
-> add-feed "Tech News" "https://news.ycombinator.com/rss"
-Feed added successfully!
-
-> browse 5
-Showing 5 most recent posts...
+```bash
+gator addfeed <url>
 ```
 
-## License
+Start the aggregator:
+
+```bash
+gator agg 30s
+```
+
+View the posts:
+
+```bash
+gator browse [limit]
+```
+
+There are a few other commands you'll need as well:
+
+- `gator login <name>` - Log in as a user that already exists
+- `gator users` - List all users
+- `gator feeds` - List all feeds
+- `gator follow <url>` - Follow a feed that already exists in the database
+- `gator unfollow <url>` - Unfollow a feed that already exists in the database
